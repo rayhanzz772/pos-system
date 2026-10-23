@@ -8,13 +8,18 @@ export async function seedRoles(db: Database): Promise<void> {
     {
       name: 'Admin',
       code: 'ADMIN',
-      description: 'This is for admin role'
+      description: 'This is for admin role',
+    },
+    {
+      name: 'Cashier',
+      code: 'CASHIER',
+      description: 'This is for cashier role',
     },
     {
       name: 'User',
       code: 'USER',
-      description: 'This is for user role'
-    }
+      description: 'This is for user role',
+    },
   ];
 
   await db
@@ -22,5 +27,5 @@ export async function seedRoles(db: Database): Promise<void> {
     .values(rolesData)
     .onConflictDoNothing();
 
-  console.log(`  ✅ Users selesai ditanam (${rolesData.length} users)!`);
+  console.log(`  ✅ Roles selesai ditanam (${rolesData.length} roles)!`);
 }

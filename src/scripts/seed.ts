@@ -13,6 +13,8 @@ interface SeedTask {
 const seedTasks: SeedTask[] = [
   { name: '01 - Roles', run: seed.seedRoles },
   { name: '02 - Users', run: seed.seedUsers },
+  { name: '03 - Products', run: seed.seedProducts },
+  { name: '04 - POS Orders', run: seed.seedPosOrders },
 ];
 
 async function runMasterSeed() {

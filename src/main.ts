@@ -1,7 +1,7 @@
-
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import helmet from 'helmet';
 import { AppModule } from './app.module.js';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor.js';
@@ -13,6 +13,8 @@ async function bootstrap() {
   const apiPrefix = config.get<string>('app.apiPrefix', 'api/v1');
   const port = config.get<number>('app.port', 3000);
   const corsOrigin = config.get<string>('app.corsOrigin', 'http://localhost:5173');
+
+  app.use(helmet());
 
   app.setGlobalPrefix(apiPrefix);
 

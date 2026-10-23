@@ -1,4 +1,14 @@
-import { Controller, Get, Param, Post, Body, Put, Delete, Query, Inject } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { PaginationQueryDto } from '../../common/dto/pagination-query.dto.js';
@@ -10,7 +20,7 @@ export class UsersController {
   constructor(
     @Inject(USERS_SERVICE)
     private readonly usersService: IUsersService,
-  ) { }
+  ) {}
 
   @Get()
   findAll(@Query() query: PaginationQueryDto) {

@@ -1,4 +1,3 @@
-
 import {
   Body,
   Controller,
@@ -6,12 +5,13 @@ import {
   Post,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service.js';
+import { Public } from '../auth/decorators/public.decorator.js';
 
 @Controller('payments')
 export class PaymentController {
   constructor(
     private readonly paymentService: PaymentService,
-  ) { }
+  ) {}
 
   @Post('qris')
   async createQris(
@@ -39,6 +39,7 @@ export class PaymentController {
     );
   }
 
+  @Public()
   @Post('webhook')
   @HttpCode(200)
   async webhook(@Body() payload: Record<string, any>) {
