@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PosService } from './pos.service.js';
 import { DRIZZLE } from '../../database/database.module.js';
+import { PaymentService } from '../payment/payment.service.js';
 
 describe('PosService', () => {
   let service: PosService;
@@ -12,6 +13,12 @@ describe('PosService', () => {
         {
           provide: DRIZZLE,
           useValue: {},
+        },
+        {
+          provide: PaymentService,
+          useValue: {
+            createQrisPayment: vi.fn(),
+          },
         },
       ],
     }).compile();

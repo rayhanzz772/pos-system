@@ -11,8 +11,9 @@ import { AuthModule } from './modules/auth/auth.module.js';
 import { PaymentModule } from './modules/payment/payment.module.js';
 import { ProductsModule } from './modules/products/products.module.js';
 import { PosModule } from './modules/pos/pos.module.js';
+import { PurchasesModule } from './modules/purchases/purchases.module.js';
 import { HttpLoggerMiddleware } from './common/logger/http-logger.middleware.js';
-import { AuthGuard } from './modules/auth/guards/auth.guard.js';
+import { AuthGuard } from './common/guards/auth.guard.js';
 import { configurations } from './config/index.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
@@ -35,6 +36,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     PaymentModule,
     ProductsModule,
     PosModule,
+    PurchasesModule,
   ],
   controllers: [AppController],
   providers: [

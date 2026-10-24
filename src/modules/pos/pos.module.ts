@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../../database/database.module.js';
+import { PaymentModule } from '../payment/payment.module.js';
 import { PosController } from './pos.controller.js';
 import { PosService } from './pos.service.js';
 import { POS_SERVICE } from './pos.service.interface.js';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, PaymentModule],
   controllers: [PosController],
   providers: [
     {

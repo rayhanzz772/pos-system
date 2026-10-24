@@ -15,18 +15,20 @@ import { PaginationQueryDto } from '../../common/dto/pagination-query.dto.js';
 import { createPaginationMeta } from '../../common/utils/pagination.util.js';
 import { apiResponse } from '../../common/dto/api-response.dto.js';
 import type { IPosService } from './pos.service.interface.js';
+import { PaymentService } from '../payment/payment.service.js';
 
 @Injectable()
 export class PosService implements IPosService {
   constructor(
     @Inject(DRIZZLE)
     private readonly db: Database,
+    private readonly paymentService: PaymentService,
   ) {}
 
-  async checkout(dto: CheckoutDto) {
+  async checkout(dto: CheckoutDto, authenticatedUserId?: string) {
     const productIds = dto.items.map((item) => item.productId);
 
-    return await this.db.transaction(async (tx) => {
+    const result = await this.db.transaction(async (tx) => {
       const dbProducts = await tx
         .select()
         .from(products)
@@ -72,27 +74,32 @@ export class PosService implements IPosService {
         });
       }
 
+      const paidAmount = dto.paidAmount ?? 0;
       if (
         dto.paymentMethod === PaymentMethod.CASH &&
-        dto.paidAmount < totalAmount
+        paidAmount < totalAmount
       ) {
         throw new BadRequestException(
-          `Paid amount (${dto.paidAmount}) is less than total amount (${totalAmount})`,
+          `Paid amount (${paidAmount}) is less than total amount (${totalAmount})`,
         );
       }
 
-      const changeAmount = Math.max(0, dto.paidAmount - totalAmount);
+      const isQris = dto.paymentMethod === PaymentMethod.QRIS;
+      const orderStatus = isQris ? 'PENDING' : 'COMPLETED';
+      const changeAmount = isQris ? 0 : Math.max(0, paidAmount - totalAmount);
       const invoiceNumber = `INV-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      const targetUserId = dto.userId ?? authenticatedUserId ?? null;
 
       const [newOrder] = await tx
         .insert(orders)
         .values({
           invoiceNumber,
-          userId: dto.userId ?? null,
+          userId: targetUserId,
           amount: totalAmount,
-          paidAmount: dto.paidAmount,
+          paidAmount: isQris ? 0 : paidAmount,
           changeAmount,
-          orderStatus: 'COMPLETED',
+          orderStatus,
           paymentMethod: dto.paymentMethod,
         })
         .returning();
@@ -113,14 +120,55 @@ export class PosService implements IPosService {
           .where(eq(products.id, item.productId));
       }
 
-      return apiResponse(
-        {
-          order: newOrder,
-          items: itemsToInsert,
-        },
-        'POS transaction completed successfully',
-      );
+      return {
+        newOrder,
+        itemsToInsert,
+        totalAmount,
+        productMap,
+      };
     });
+
+    if (dto.paymentMethod === PaymentMethod.QRIS) {
+      try {
+        const payment = await this.paymentService.createQrisPayment(
+          result.newOrder.id,
+          result.totalAmount,
+        );
+
+        return apiResponse(
+          {
+            order: result.newOrder,
+            items: result.itemsToInsert,
+            payment,
+          },
+          'POS order created. Please scan QRIS to complete payment',
+        );
+      } catch (err: any) {
+        await this.db.transaction(async (tx) => {
+          await tx
+            .update(orders)
+            .set({ orderStatus: 'CANCELLED' })
+            .where(eq(orders.id, result.newOrder.id));
+
+          for (const item of result.itemsToInsert) {
+            const currentProduct = result.productMap.get(item.productId)!;
+            await tx
+              .update(products)
+              .set({ stock: currentProduct.stock })
+              .where(eq(products.id, item.productId));
+          }
+        });
+        throw err;
+      }
+    }
+
+    return apiResponse(
+      {
+        order: result.newOrder,
+        items: result.itemsToInsert,
+      },
+      'POS transaction completed successfully',
+    );
   }
 
   async getOrderHistory(query: PaginationQueryDto) {

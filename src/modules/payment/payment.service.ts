@@ -56,13 +56,20 @@ export class PaymentService {
         },
       });
 
-      await this.db.insert(orders).values({
-        id: finalOrderId,
-        userId: 'pmbipbf026u9awlpwl139k4j',
-        amount: amount,
-        orderStatus: 'PENDING',
-        paymentMethod: 'QRIS',
-      });
+      const existingOrder = await this.db
+        .select()
+        .from(orders)
+        .where(eq(orders.id, finalOrderId));
+
+      if (existingOrder.length === 0) {
+        await this.db.insert(orders).values({
+          id: finalOrderId,
+          userId: 'pmbipbf026u9awlpwl139k4j',
+          amount: amount,
+          orderStatus: 'PENDING',
+          paymentMethod: 'QRIS',
+        });
+      }
 
       const actions = response.actions ?? [];
 
@@ -158,13 +165,20 @@ export class PaymentService {
 
       const response = await this.coreApi.charge(chargePayload);
 
-      await this.db.insert(orders).values({
-        id: finalOrderId,
-        userId: 'pmbipbf026u9awlpwl139k4j',
-        amount: amount,
-        orderStatus: 'PENDING',
-        paymentMethod: `VA_${bank.toUpperCase()}`,
-      });
+      const existingOrder = await this.db
+        .select()
+        .from(orders)
+        .where(eq(orders.id, finalOrderId));
+
+      if (existingOrder.length === 0) {
+        await this.db.insert(orders).values({
+          id: finalOrderId,
+          userId: 'pmbipbf026u9awlpwl139k4j',
+          amount: amount,
+          orderStatus: 'PENDING',
+          paymentMethod: `VA_${bank.toUpperCase()}`,
+        });
+      }
 
       let vaNumber: string | undefined;
       let billKey: string | undefined;
@@ -226,9 +240,13 @@ export class PaymentService {
     const transactionStatus = status.transaction_status;
 
     if (transactionStatus === 'settlement') {
-      await this.db.update(orders).set({
-        orderStatus: 'PAID',
-      }).where(eq(orders.id, orderId));
+      await this.db
+        .update(orders)
+        .set({
+          orderStatus: 'PAID',
+          paidAmount: Math.round(Number(status.gross_amount)) || undefined,
+        })
+        .where(eq(orders.id, orderId));
     } else if (
       transactionStatus === 'expire' ||
       transactionStatus === 'cancel'

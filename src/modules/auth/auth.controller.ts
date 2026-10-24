@@ -9,8 +9,8 @@ import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { AUTH_SERVICE } from './auth.service.interface.js';
 import type { IAuthService } from './auth.service.interface.js';
-import { CurrentUser } from './decorators/current-user.decorator.js';
-import { Public } from './decorators/public.decorator.js';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import { Public } from '../../common/decorators/public.decorator.js';
 
 @Controller('auth')
 export class AuthController {

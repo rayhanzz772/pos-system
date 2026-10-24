@@ -29,6 +29,13 @@
       "when": 1792773809014,
       "tag": "0003_bizarre_sandman",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792817307495,
+      "tag": "0004_slippery_boomerang",
+      "breakpoints": true
     }
   ]
 }

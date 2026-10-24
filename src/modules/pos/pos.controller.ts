@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { CheckoutDto } from './dto/checkout.dto.js';
 import { PaginationQueryDto } from '../../common/dto/pagination-query.dto.js';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { POS_SERVICE } from './pos.service.interface.js';
 import type { IPosService } from './pos.service.interface.js';
 
@@ -20,8 +21,11 @@ export class PosController {
   ) {}
 
   @Post('checkout')
-  checkout(@Body() body: CheckoutDto) {
-    return this.posService.checkout(body);
+  checkout(
+    @Body() body: CheckoutDto,
+    @CurrentUser('sub') currentUserId?: string,
+  ) {
+    return this.posService.checkout(body, currentUserId);
   }
 
   @Get('orders')

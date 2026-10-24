@@ -104,6 +104,10 @@ Controller (@Inject(TOKEN) interface)
   - `POST /pos/checkout`
   - `GET /pos/orders`
   - `GET /pos/orders/:id`
+- Purchases (`@Controller('purchases')`):
+  - `POST /purchases`
+  - `GET /purchases`
+  - `GET /purchases/:id`
 - Payments (`@Controller('payments')`):
   - `POST /payments/qris`
   - `POST /payments/bank-transfer`
@@ -116,8 +120,10 @@ Controller (@Inject(TOKEN) interface)
 - `products`: id (CUID2 PK), sku (unique), name, description, price (integer), stock (integer, default 0), is_active (boolean, default true), created_at, updated_at, deleted_at
 - `orders`: id (CUID2 PK), invoice_number, user_id → users.id, amount (integer), paid_amount (integer), change_amount (integer), order_status, payment_method, created_at, updated_at, deleted_at
 - `order_items`: id (CUID2 PK), order_id → orders.id (cascade delete), product_id → products.id, quantity (integer), unit_price (integer), subtotal (integer), created_at
+- `purchases`: id (CUID2 PK), invoice_number, supplier_name, user_id → users.id, total_amount (integer), notes, status, created_at, updated_at, deleted_at
+- `purchase_items`: id (CUID2 PK), purchase_id → purchases.id (cascade delete), product_id → products.id, quantity (integer), unit_cost (integer), subtotal (integer), created_at
 
-Migrations live in `drizzle/` (`0000` to `0003`); config in `drizzle.config.ts` (schema entry: `src/database/schema/index.ts`).
+Migrations live in `drizzle/` (`0000` to `0004`); config in `drizzle.config.ts` (schema entry: `src/database/schema/index.ts`).
 
 ## Environment
 
@@ -127,11 +133,11 @@ Defaults if unset: port 3000, prefix `api/v1`, CORS `http://localhost:5173`.
 
 ## Verification Status (verified 2026-10-24)
 
-- `npm test`: 11 of 11 unit tests PASS.
+- `npm test`: 13 of 13 unit tests PASS.
 - `npm run test:e2e`: 1 of 1 e2e test PASS (`GET /health/db`).
 - `npm run lint`: 0 errors, 0 warnings.
 - `npm run build`: successful.
-- `npm run db:migrate`: all 4 migrations applied.
+- `npm run db:migrate`: all 5 migrations applied.
 - `npm run db:seed`: all 4 seeders (roles, users, products, pos-orders) complete successfully.
 
 ## Known issues & Technical Debt

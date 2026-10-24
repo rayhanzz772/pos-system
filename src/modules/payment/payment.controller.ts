@@ -5,7 +5,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service.js';
-import { Public } from '../auth/decorators/public.decorator.js';
+import { Public } from '../../common/decorators/public.decorator.js';
 
 @Controller('payments')
 export class PaymentController {

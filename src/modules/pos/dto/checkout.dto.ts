@@ -39,9 +39,10 @@ export class CheckoutDto {
   @IsEnum(PaymentMethod)
   paymentMethod: PaymentMethod;
 
+  @IsOptional()
   @IsInt()
   @Min(0)
-  paidAmount: number;
+  paidAmount?: number;
 
   @IsOptional()
   @IsString()

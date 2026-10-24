@@ -6,7 +6,7 @@ import { SecurityModule } from '../../security/security.module.js';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { AUTH_SERVICE } from './auth.service.interface.js';
-import { AuthGuard } from './guards/auth.guard.js';
+import { AuthGuard } from '../../common/guards/auth.guard.js';
 
 @Module({
   imports: [
