@@ -18,7 +18,7 @@ import { AuthGuard } from './guards/auth.guard.js';
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('jwt.secret'),
         signOptions: {
-          expiresIn: (config.get<string>('jwt.expiresIn') ?? '1d') as any,
+          expiresIn: (config.get<string>('jwt.expiresIn') ?? '7d') as any,
         },
       }),
     }),
