@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PaymentService } from './payment.service.js';
 import { Public } from '../../common/decorators/public.decorator.js';
+import { RefundDto } from './dto/refund.dto.js';
 
 @Controller('payments')
 export class PaymentController {
@@ -37,6 +38,11 @@ export class PaymentController {
       body.amount,
       body.bank,
     );
+  }
+
+  @Post('refund')
+  async refund(@Body() body: RefundDto) {
+    return this.paymentService.processRefund(body);
   }
 
   @Public()

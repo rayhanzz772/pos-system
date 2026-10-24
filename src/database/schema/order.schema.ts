@@ -21,6 +21,9 @@ export const orders = pgTable('orders', {
   amount: integer('amount').notNull(),
   paidAmount: integer('paid_amount'),
   changeAmount: integer('change_amount').default(0),
+  currency: varchar('currency', { length: 10 }).default('IDR').notNull(),
+  transactionId: varchar('transaction_id', { length: 255 }).unique(),
+  refundedAmount: integer('refunded_amount').default(0).notNull(),
   orderStatus: varchar('order_status', { length: 100 }).notNull(),
   paymentMethod: varchar('payment_method', { length: 100 }).notNull(),
   createdAt: timestamp('created_at')
